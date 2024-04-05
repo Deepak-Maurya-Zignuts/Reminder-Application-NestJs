@@ -1,0 +1,91 @@
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { User, UserDocument } from './schema/users';
+import { Model } from 'mongoose';
+import * as bcrypt from 'bcryptjs';
+import { Response } from 'express';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { ResetPasswordDto } from './dto/resetpwd.dto';
+
+@Injectable()
+export class UsersService {
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+  ) {}
+
+  async signup(createUserDto: CreateUserDto, res: Response) {
+    try {
+      const user = await this.userModel.findOne({ email: createUserDto.email });
+      if (user) {
+        // throw new Error('User already exists');
+        return res.status(400).json({ message: 'User already exists' });
+      }
+      const model = new this.userModel();
+      model.name = createUserDto.name;
+      model.email = createUserDto.email;
+      model.password = bcrypt.hashSync(createUserDto.password, 10);
+      model.save();
+      return res.status(200).json({
+        message: 'User created successfully',
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async login(loginUserDto: LoginUserDto, res: Response) {
+    try {
+      const user = await this.userModel.findOne({ email: loginUserDto.email });
+      if (!user) {
+        // throw new Error('User not found');
+        return res.status(400).json({ message: 'User not found' });
+      }
+      const isMatch = bcrypt.compareSync(loginUserDto.password, user.password);
+      if (!isMatch) {
+        // throw new Error('Invalid credentials');
+        return res.status(400).json({ message: 'Invalid credentials' });
+      }
+      return res.status(200).json({
+        message: 'Login successful',
+        // token: user.id,
+      });
+    } catch (error) {
+      console.log(error.message);
+      return res.status(400).json({ message: error.message });
+    }
+  }
+
+  // eslint-disable-next-line prettier/prettier
+  async resetPassword(id: string, resetPasswordDto: ResetPasswordDto, res: Response) {
+    try {
+      const user = await this.userModel.findById(id);
+      if (!user) {
+        // throw new Error('User not found');
+        return res.status(400).json({ message: 'User not found' });
+      }
+
+      const isMatch = bcrypt.compareSync(
+        resetPasswordDto.oldPassword,
+        user.password,
+      );
+
+      if (!isMatch) {
+        // throw new Error('Invalid credentials');
+        return res.status(400).json({ message: 'Invalid credentials' });
+      }
+      const newPassword = bcrypt.hashSync(resetPasswordDto.newPassword);
+      await this.userModel.findByIdAndUpdate(
+        id,
+        { password: newPassword },
+        { new: true },
+      );
+      return res.status(200).json({
+        message: 'Password updated successfully',
+      });
+    } catch (error) {
+      console.log(error.message);
+      return res.status(400).json({ message: error.message });
+    }
+  }
+}
