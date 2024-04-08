@@ -10,7 +10,7 @@ import { RemindersModule } from './reminders/reminders.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: '.dev.env',
     }),
     MongooseModule.forRootAsync({
       useFactory: async () => ({

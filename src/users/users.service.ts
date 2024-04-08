@@ -7,6 +7,7 @@ import { Response } from 'express';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { ResetPasswordDto } from './dto/resetpwd.dto';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class UsersService {
@@ -46,6 +47,16 @@ export class UsersService {
         // throw new Error('Invalid credentials');
         return res.status(400).json({ message: 'Invalid credentials' });
       }
+      const authToken = jwt.sign(
+        {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' },
+      );
+      res.setHeader('authorization', authToken);
       return res.status(200).json({
         message: 'Login successful',
         // token: user.id,
@@ -57,9 +68,9 @@ export class UsersService {
   }
 
   // eslint-disable-next-line prettier/prettier
-  async resetPassword(id: string, resetPasswordDto: ResetPasswordDto, res: Response) {
+  async resetPassword(ownerId: string, resetPasswordDto: ResetPasswordDto, res: Response) {
     try {
-      const user = await this.userModel.findById(id);
+      const user = await this.userModel.findById(ownerId);
       if (!user) {
         // throw new Error('User not found');
         return res.status(400).json({ message: 'User not found' });
@@ -76,7 +87,7 @@ export class UsersService {
       }
       const newPassword = bcrypt.hashSync(resetPasswordDto.newPassword);
       await this.userModel.findByIdAndUpdate(
-        id,
+        ownerId,
         { password: newPassword },
         { new: true },
       );
@@ -87,5 +98,12 @@ export class UsersService {
       console.log(error.message);
       return res.status(400).json({ message: error.message });
     }
+  }
+
+  async logout(res: Response) {
+    res.setHeader('authorization', '');
+    return res.status(200).json({
+      message: 'Logout successful',
+    });
   }
 }

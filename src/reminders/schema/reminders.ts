@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type ReminderDocument = Reminder & Document;
 
@@ -8,7 +8,7 @@ export class Reminder {
   @Prop({ type: String, required: true })
   title: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String })
   body: string;
 
   @Prop({ type: Date, required: true })
@@ -16,6 +16,9 @@ export class Reminder {
 
   @Prop({ type: String, required: true })
   time: string;
+
+  @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
+  owner: Types.ObjectId;
 }
 
-export const Reminderschema = SchemaFactory.createForClass(Reminder);
+export const reminderSchema = SchemaFactory.createForClass(Reminder);
