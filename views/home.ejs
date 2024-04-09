@@ -7,61 +7,96 @@
   </head>
   <body>
     <h1>Reminder Application</h1>
+
+    <button onclick="showSignup()">register</button>
+    <button onclick="showLogin()">login</button>
+
+    <div id="signup" style="display: none;">
+      <form action="/users/signup" method="POST">
+        <label for="name">Name</label>
+        <input type="text" name="name" id="name" />
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" />
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" />
+        <button type="submit">Sign Up</button>
+      </form>
+    </div>
+
+    <div id="login" style="display: none;">
+      <form action="/users/login" method="POST">
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" />
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" />
+        <button type="submit">Login</button>
+      </form>
+    </div>
   </body>
   <!-- ------------------- service worker -------------------- -->
   <script>
-    // if ('serviceWorker' in navigator) {
-    //   window.addEventListener('load', function () {
-    //     navigator.serviceWorker.register('/js/service-worker.js').then(
-    //       function (registration) {
-    //         // Registration was successful
-    //         console.log(
-    //           'ServiceWorker registration successful with scope: ',
-    //           registration.scope,
-    //         );
-    //       },
-    //       function (err) {
-    //         // registration failed :(
-    //         console.log('ServiceWorker registration failed: ', err);
-    //       },
-    //     );
-    //   });
-    // }
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/js/service-worker.js').then(
+          function (registration) {
+            // Registration was successful
+            console.log(
+              'ServiceWorker registration successful with scope: ',
+              registration.scope,
+            );
+          },
+          function (err) {
+            // registration failed :(
+            console.log('ServiceWorker registration failed: ', err);
+          },
+        );
+      });
+    }
 
-    const checkPermission = () => {
-      if (!('serviceWorker' in navigator)) {
-        throw new Error('No support for service worker!');
-      }
+    // const checkPermission = () => {
+    //   if (!('serviceWorker' in navigator)) {
+    //     throw new Error('No support for service worker!');
+    //   }
 
-      if (!('Notification' in window)) {
-        throw new Error('No support for notification API');
-      }
+    //   if (!('Notification' in window)) {
+    //     throw new Error('No support for notification API');
+    //   }
 
-      if (!('PushManager' in window)) {
-        throw new Error('No support for Push API');
-      }
-    };
+    //   if (!('PushManager' in window)) {
+    //     throw new Error('No support for Push API');
+    //   }
+    // };
 
-    const registerSW = async () => {
-      const registration = await navigator.serviceWorker.register('/js/service-worker.js');
-      return registration;
-    };
+    // const registerSW = async () => {
+    //   const registration = await navigator.serviceWorker.register('/js/service-worker.js');
+    //   return registration;
+    // };
 
-    const requestNotificationPermission = async () => {
-      const permission = await Notification.requestPermission();
+    // const requestNotificationPermission = async () => {
+    //   const permission = await Notification.requestPermission();
 
-      if (permission !== 'granted') {
-        throw new Error('Notification permission not granted');
-      }
-    };
+    //   if (permission !== 'granted') {
+    //     throw new Error('Notification permission not granted');
+    //   }
+    // };
 
-    const main = async () => {
-      checkPermission();
-      await requestNotificationPermission();
-      await registerSW();
-    };
+    // const main = async () => {
+    //   checkPermission();
+    //   await requestNotificationPermission();
+    //   await registerSW();
+    // };
   </script>
   <!-- ------------------------------------------------------- -->
+  <script>
+    const showSignup = () => {
+      document.querySelector('#signup').style.display = 'block';
+      document.querySelector('#login').style.display = 'none';
+    };
+    const showLogin = () => {
+      document.querySelector('#signup').style.display = 'none';
+      document.querySelector('#login').style.display = 'block';
+    };
+  </script>
 </html>
 
 

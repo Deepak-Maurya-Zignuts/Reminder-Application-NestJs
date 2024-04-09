@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User-Dashboard</title>
+  </head>
+  <body>
+    <span style="display: none;"><%= userId %></span>
+    <button onclick="openAddReminder()">Add Reminder</button>
+    <div class="addReminderForm">
+        <form>
+            <label for="title">Title</label>
+            <input type="text" name="title" id="title" />
+            <label for="body">Body</label>
+            <input type="text" name="body" id="body" />
+            <label for="date">Date</label>
+            <input type="date" name="date" id="date" />
+            <label for="time">Time</label>
+            <input type="time" name="time" id="time" />
+        </form>
+    </div>
+    <div id="reminder-list"></div>
+  </body>
+  <script>
+    const userId = '<%= userId %>';
+    console.log(userId);
+    console.log(document.cookie);
+
+    const authorization = getCookie('token');
+    console.log('Token cookie:', authorization);
+
+    function getCookie(name) {
+      const cookieString = document.cookie.split('; ');
+      for (const cookie of cookieString) {
+        const [cookieName, cookieValue] = cookie.split('=');
+        if (cookieName === name) {
+          return decodeURIComponent(cookieValue);
+        }
+      }
+      return null;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    const showAllReminders = () => {
+      fetch(`/reminders/${userId}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `${authorization}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          let reminders = data.map((reminder) => {
+            return `
+                        <li>${reminder.title}</li>
+                    `;
+          });
+          document.getElementById('reminder-list').innerHTML = reminders;
+        });
+    };
+    showAllReminders();
+  </script>
+</html>

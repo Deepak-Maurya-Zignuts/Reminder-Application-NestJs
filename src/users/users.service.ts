@@ -58,11 +58,15 @@ export class UsersService {
         process.env.JWT_SECRET,
         { expiresIn: '1h' },
       );
-      res.setHeader('authorization', authToken);
-      return res.status(200).json({
-        message: 'Login successful',
-        // token: user.id,
-      });
+
+      res.cookie('token', authToken);
+      res.cookie('userId', user.id);
+
+      // return res.status(200).json({
+      //   message: 'Login successful',
+      //   // token: user.id,
+      // });
+      return res.redirect('/user-dashboard');
     } catch (error) {
       console.log(error.message);
       return res.status(400).json({ message: error.message });
