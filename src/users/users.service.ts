@@ -15,6 +15,7 @@ export class UsersService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
+  // Create a user
   async signup(createUserDto: CreateUserDto, res: Response) {
     try {
       const user = await this.userModel.findOne({ email: createUserDto.email });
@@ -35,6 +36,7 @@ export class UsersService {
     }
   }
 
+  //  Login a user
   async login(loginUserDto: LoginUserDto, res: Response) {
     try {
       const user = await this.userModel.findOne({ email: loginUserDto.email });
@@ -67,6 +69,7 @@ export class UsersService {
     }
   }
 
+  // Reset password
   // eslint-disable-next-line prettier/prettier
   async resetPassword(ownerId: string, resetPasswordDto: ResetPasswordDto, res: Response) {
     try {
@@ -100,6 +103,7 @@ export class UsersService {
     }
   }
 
+  // Logout
   async logout(res: Response) {
     res.setHeader('authorization', '');
     return res.status(200).json({

@@ -8,10 +8,12 @@ import { RemindersModule } from './reminders/reminders.module';
 
 @Module({
   imports: [
+    // importing ConfigModule required for the.env file to be loaded
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.dev.env',
     }),
+    // importing MongooseModule required for the connection to MongoDB to be established
     MongooseModule.forRootAsync({
       useFactory: async () => ({
         uri: process.env.MONGO_URI,

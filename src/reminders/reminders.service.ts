@@ -14,6 +14,7 @@ export class RemindersService {
     private readonly reminderModel: Model<ReminderDocument>,
   ) {}
 
+  // Create a reminder
   async create(createReminderDto: CreateReminderDto, res: Response) {
     try {
       const reminder = new this.reminderModel();
@@ -34,11 +35,13 @@ export class RemindersService {
     }
   }
 
+  // Get all reminders
   async findAll(ownerId: Types.ObjectId) {
     const reminders = await this.reminderModel.find({ owner: ownerId });
     return reminders;
   }
 
+  // Get a reminder
   async findOne(ownerId: string, id: string, res: Response) {
     try {
       const reminder = await this.reminderModel.findOne({
@@ -55,6 +58,7 @@ export class RemindersService {
     }
   }
 
+  // Update a reminder
   // eslint-disable-next-line prettier/prettier
   async update(ownerId: string, id: string, updateReminderDto: UpdateReminderDto, res: Response) {
     try {
@@ -79,6 +83,7 @@ export class RemindersService {
     }
   }
 
+  // Delete a reminder
   async remove(ownerId: string, id: string, res: Response) {
     const filter = {
       _id: id,
@@ -90,6 +95,7 @@ export class RemindersService {
     });
   }
 
+  // get upcoming reminders
   async upcomingReminders(ownerId: string, res: Response) {
     try {
       const currentDate = new Date();
@@ -109,6 +115,7 @@ export class RemindersService {
     }
   }
 
+  // send email reminder to user which are upcoming in 10 minutes
   async pushReminder(ownerId: string, res: Response) {
     try {
       const currentDateTime = new Date();

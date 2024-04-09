@@ -11,16 +11,19 @@ import { AuthGuard } from 'src/Guard/auth.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // Create a user
   @Post('/signup')
   signup(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
     return this.usersService.signup(createUserDto, res);
   }
 
+  // Login a user
   @Post('/login')
   login(@Body() loginUserDto: LoginUserDto, @Res() res: Response) {
     return this.usersService.login(loginUserDto, res);
   }
 
+  // Reset password
   @UseGuards(new AuthGuard())
   @Patch(':ownerId')
   resetPassword(
@@ -31,6 +34,7 @@ export class UsersController {
     return this.usersService.resetPassword(ownerId, resetPasswordDto, res);
   }
 
+  // logout a user
   @UseGuards(new AuthGuard())
   @Post('logout/:ownerId')
   logout(@Param('ownerId') ownerId: string, @Res() res: Response) {
