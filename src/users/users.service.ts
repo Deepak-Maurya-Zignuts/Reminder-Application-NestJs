@@ -21,7 +21,10 @@ export class UsersService {
       const user = await this.userModel.findOne({ email: createUserDto.email });
       if (user) {
         // throw new Error('User already exists');
-        return res.status(400).json({ message: 'User already exists' });
+        return res.status(400).json({
+          success: false,
+          message: 'User already exists',
+        });
       }
       const model = new this.userModel();
       model.name = createUserDto.name;
@@ -29,10 +32,15 @@ export class UsersService {
       model.password = bcrypt.hashSync(createUserDto.password, 10);
       model.save();
       return res.status(200).json({
+        success: true,
         message: 'User created successfully',
       });
     } catch (error) {
       console.log(error);
+      return res.status(400).json({
+        error: error.message,
+        message: 'Error creating user',
+      });
     }
   }
 
@@ -42,12 +50,18 @@ export class UsersService {
       const user = await this.userModel.findOne({ email: loginUserDto.email });
       if (!user) {
         // throw new Error('User not found');
-        return res.status(400).json({ message: 'User not found' });
+        return res.status(400).json({
+          success: false,
+          message: 'User not found',
+        });
       }
       const isMatch = bcrypt.compareSync(loginUserDto.password, user.password);
       if (!isMatch) {
         // throw new Error('Invalid credentials');
-        return res.status(400).json({ message: 'Invalid credentials' });
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid credentials',
+        });
       }
       const authToken = jwt.sign(
         {
@@ -62,14 +76,19 @@ export class UsersService {
       res.cookie('token', authToken);
       res.cookie('userId', user.id);
 
-      // return res.status(200).json({
-      //   message: 'Login successful',
-      //   // token: user.id,
-      // });
-      return res.redirect('/user-dashboard');
+      return res.status(200).json({
+        success: true,
+        message: 'Login successful',
+        userId: user.id,
+        token: authToken,
+      });
+      // return res.redirect('/user-dashboard');
     } catch (error) {
       console.log(error.message);
-      return res.status(400).json({ message: error.message });
+      return res.status(400).json({
+        error: error.message,
+        message: 'Error logging in',
+      });
     }
   }
 
@@ -80,7 +99,10 @@ export class UsersService {
       const user = await this.userModel.findById(ownerId);
       if (!user) {
         // throw new Error('User not found');
-        return res.status(400).json({ message: 'User not found' });
+        return res.status(400).json({
+          success: false,
+          message: 'User not found',
+        });
       }
 
       const isMatch = bcrypt.compareSync(
@@ -90,7 +112,10 @@ export class UsersService {
 
       if (!isMatch) {
         // throw new Error('Invalid credentials');
-        return res.status(400).json({ message: 'Invalid credentials' });
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid credentials',
+        });
       }
       const newPassword = bcrypt.hashSync(resetPasswordDto.newPassword);
       await this.userModel.findByIdAndUpdate(
@@ -99,19 +124,33 @@ export class UsersService {
         { new: true },
       );
       return res.status(200).json({
+        success: true,
         message: 'Password updated successfully',
       });
     } catch (error) {
       console.log(error.message);
-      return res.status(400).json({ message: error.message });
+      return res.status(400).json({
+        error: error.message,
+        message: 'Error updating password',
+      });
     }
   }
 
   // Logout
   async logout(res: Response) {
-    res.setHeader('authorization', '');
-    return res.status(200).json({
-      message: 'Logout successful',
-    });
+    try {
+      res.clearCookie('token');
+      res.clearCookie('userId');
+      res.setHeader('authorization', '');
+      return res.status(200).json({
+        message: 'Logout successful',
+      });
+    } catch (error) {
+      console.log(error.message);
+      return res.status(400).json({
+        error: error.message,
+        message: 'Error logging out',
+      });
+    }
   }
 }

@@ -25,20 +25,34 @@ export class RemindersService {
       reminder.owner = createReminderDto.owner;
       await reminder.save();
       return res.status(200).json({
+        success: true,
         message: 'Reminder created successfully',
       });
     } catch (error) {
       console.log(error.message);
       return res.status(400).json({
+        error: error.message,
         message: 'Error creating reminder',
       });
     }
   }
 
   // Get all reminders
-  async findAll(ownerId: Types.ObjectId) {
-    const reminders = await this.reminderModel.find({ owner: ownerId });
-    return reminders;
+  async findAll(ownerId: Types.ObjectId, res: Response) {
+    try {
+      const reminders = await this.reminderModel.find({ owner: ownerId });
+      return res.status(200).json({
+        success: true,
+        message: 'Reminders fetched successfully',
+        reminders,
+      });
+    } catch (error) {
+      console.error(error.message);
+      return res.status(500).json({
+        error: error.message,
+        message: 'Error fetching reminders',
+      });
+    }
   }
 
   // Get a reminder
@@ -49,12 +63,22 @@ export class RemindersService {
         owner: ownerId,
       });
       if (!reminder) {
-        return res.status(404).json({ message: 'Reminder not found' });
+        return res.status(404).json({
+          success: false,
+          message: 'Reminder not found',
+        });
       }
-      return res.status(200).json(reminder);
+      return res.status(200).json({
+        success: true,
+        message: 'Reminder fetched successfully',
+        reminder,
+      });
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Error fetching reminder' });
+      console.error(error.message);
+      return res.status(500).json({
+        error: error.message,
+        message: 'Error fetching reminder',
+      });
     }
   }
 
@@ -73,11 +97,14 @@ export class RemindersService {
       );
       console.log(reminder);
       return res.status(200).json({
+        success: true,
         message: 'Reminder updated successfully',
+        reminder,
       });
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
       return res.status(400).json({
+        error: error.message,
         message: 'Error updating reminder',
       });
     }
@@ -85,14 +112,22 @@ export class RemindersService {
 
   // Delete a reminder
   async remove(ownerId: string, id: string, res: Response) {
-    const filter = {
-      _id: id,
-      owner: ownerId,
-    };
-    await this.reminderModel.deleteOne(filter);
-    return res.status(200).json({
-      message: 'Reminder deleted successfully',
-    });
+    try {
+      const filter = {
+        _id: id,
+        owner: ownerId,
+      };
+      await this.reminderModel.deleteOne(filter);
+      return res.status(200).json({
+        message: 'Reminder deleted successfully',
+      });
+    } catch (error) {
+      console.log(error.message);
+      return res.status(400).json({
+        error: error.message,
+        message: 'Error deleting reminder',
+      });
+    }
   }
 
   // get upcoming reminders
@@ -106,10 +141,15 @@ export class RemindersService {
         },
       });
       console.log(reminders);
-      return res.status(200).json(reminders);
+      return res.status(200).json({
+        success: true,
+        message: 'Upcoming reminders fetched successfully',
+        reminders,
+      });
     } catch (error) {
       console.log(error.message);
       return res.status(400).json({
+        error: error.message,
         message: 'Error fetching upcoming reminders',
       });
     }
@@ -162,6 +202,7 @@ export class RemindersService {
         await transporter.sendMail(mailOptions);
 
         return res.status(200).json({
+          success: true,
           message: 'Reminder pushed successfully',
         });
       } else {
@@ -174,6 +215,7 @@ export class RemindersService {
     } catch (error) {
       console.log(error.message);
       return res.status(400).json({
+        error: error.message,
         message: 'Error pushing reminder',
       });
     }

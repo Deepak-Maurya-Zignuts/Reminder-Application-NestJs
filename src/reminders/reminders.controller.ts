@@ -25,8 +25,8 @@ export class RemindersController {
   // Get all reminders
   @UseGuards(new AuthGuard())
   @Get(':ownerId')
-  findAll(@Param('ownerId') ownerId: Types.ObjectId) {
-    return this.remindersService.findAll(ownerId);
+  findAll(@Param('ownerId') ownerId: Types.ObjectId, @Res() res: Response) {
+    return this.remindersService.findAll(ownerId, res);
   }
 
   // Get a reminder

@@ -25,7 +25,7 @@ export class UsersController {
 
   // Reset password
   @UseGuards(new AuthGuard())
-  @Patch(':ownerId')
+  @Patch('resetpwd/:ownerId')
   resetPassword(
     @Param('ownerId') ownerId: string,
     @Body() resetPasswordDto: ResetPasswordDto,
