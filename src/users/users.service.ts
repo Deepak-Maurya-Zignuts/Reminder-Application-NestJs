@@ -73,7 +73,10 @@ export class UsersService {
         { expiresIn: '1h' },
       );
 
-      res.cookie('token', authToken);
+      res.cookie('token', authToken, {
+        httpOnly: true,
+        maxAge: 3600000,
+      });
       res.cookie('userId', user.id);
 
       return res.status(200).json({
