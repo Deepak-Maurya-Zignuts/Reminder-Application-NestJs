@@ -31,6 +31,7 @@ export class RemindersService {
     } catch (error) {
       console.log(error.message);
       return res.status(400).json({
+        success: false,
         error: error.message,
         message: 'Error creating reminder',
       });
@@ -49,6 +50,7 @@ export class RemindersService {
     } catch (error) {
       console.error(error.message);
       return res.status(500).json({
+        success: false,
         error: error.message,
         message: 'Error fetching reminders',
       });
@@ -76,6 +78,7 @@ export class RemindersService {
     } catch (error) {
       console.error(error.message);
       return res.status(500).json({
+        success: false,
         error: error.message,
         message: 'Error fetching reminder',
       });
@@ -104,6 +107,7 @@ export class RemindersService {
     } catch (error) {
       console.log(error.message);
       return res.status(400).json({
+        success: false,
         error: error.message,
         message: 'Error updating reminder',
       });
@@ -119,11 +123,13 @@ export class RemindersService {
       };
       await this.reminderModel.deleteOne(filter);
       return res.status(200).json({
+        success: true,
         message: 'Reminder deleted successfully',
       });
     } catch (error) {
       console.log(error.message);
       return res.status(400).json({
+        success: false,
         error: error.message,
         message: 'Error deleting reminder',
       });
@@ -149,6 +155,7 @@ export class RemindersService {
     } catch (error) {
       console.log(error.message);
       return res.status(400).json({
+        success: false,
         error: error.message,
         message: 'Error fetching upcoming reminders',
       });

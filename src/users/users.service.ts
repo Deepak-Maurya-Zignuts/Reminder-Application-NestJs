@@ -38,6 +38,7 @@ export class UsersService {
     } catch (error) {
       console.log(error);
       return res.status(400).json({
+        success: false,
         error: error.message,
         message: 'Error creating user',
       });
@@ -89,6 +90,7 @@ export class UsersService {
     } catch (error) {
       console.log(error.message);
       return res.status(400).json({
+        success: false,
         error: error.message,
         message: 'Error logging in',
       });
@@ -133,6 +135,7 @@ export class UsersService {
     } catch (error) {
       console.log(error.message);
       return res.status(400).json({
+        success: false,
         error: error.message,
         message: 'Error updating password',
       });
@@ -146,11 +149,13 @@ export class UsersService {
       res.clearCookie('userId');
       res.setHeader('authorization', '');
       return res.status(200).json({
+        success: true,
         message: 'Logout successful',
       });
     } catch (error) {
       console.log(error.message);
       return res.status(400).json({
+        success: false,
         error: error.message,
         message: 'Error logging out',
       });
