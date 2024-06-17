@@ -76,4 +76,14 @@ export class RemindersController {
   pushReminder(@Param('ownerId') ownerId: string, @Res() res: Response) {
     return this.remindersService.pushReminder(ownerId, res);
   }
+
+  // cron url
+  @Get('/pushReminder/:ownerId/:reminderId')
+  cronReminder(
+    @Param('ownerId') ownerId: string,
+    @Param('reminderId') reminderId: string,
+    @Res() res: Response,
+  ) {
+    return this.remindersService.cronReminder(ownerId, reminderId, res);
+  }
 }

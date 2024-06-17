@@ -5,6 +5,9 @@ import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Response } from 'express';
 import { Reminder, ReminderDocument } from './schema/reminders';
+import { User, UserDocument } from 'src/users/schema/users';
+import { RemindersUtil } from './utils/reminders.util';
+import { EmailsUtil } from './utils/email.util';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
@@ -12,6 +15,10 @@ export class RemindersService {
   constructor(
     @InjectModel(Reminder.name)
     private readonly reminderModel: Model<ReminderDocument>,
+    @InjectModel(User.name)
+    private readonly userModel: Model<UserDocument>,
+    private readonly remindersUtil: RemindersUtil,
+    private readonly emailsUtil: EmailsUtil,
   ) {}
 
   // Create a reminder
@@ -23,7 +30,20 @@ export class RemindersService {
       reminder.date = createReminderDto.date;
       reminder.time = createReminderDto.time;
       reminder.owner = createReminderDto.owner;
-      await reminder.save();
+      const savedReminder = await reminder.save();
+
+      const reminderId = savedReminder.id;
+      console.log(reminderId);
+
+      // ** Create a cron job here **
+      const cronCreated = await this.remindersUtil.createCronJob(
+        createReminderDto.owner,
+        reminderId,
+      );
+
+      if (!cronCreated.success) {
+        throw new Error('Cron job creation failed');
+      }
       return res.status(200).json({
         success: true,
         message: 'Reminder created successfully',
@@ -224,6 +244,49 @@ export class RemindersService {
       return res.status(400).json({
         error: error.message,
         message: 'Error pushing reminder',
+      });
+    }
+  }
+
+  async cronReminder(ownerId: string, reminderId: string, res: Response) {
+    try {
+      const reminder = await this.reminderModel
+        .findById(reminderId)
+        .populate('owner', 'email');
+      // const user = await this.userModel.findById(ownerId);
+
+      if (!reminder) {
+        return res.status(404).json({
+          success: false,
+          message: 'Reminder not found',
+        });
+      }
+
+      const owner = reminder.owner as unknown as User;
+
+      console.log(owner.email);
+      // console.log(user);
+
+      const emailSent = await this.emailsUtil.sendReminderEmail(
+        owner.email,
+        reminder.title,
+        reminder.body,
+      );
+
+      if (!emailSent) {
+        throw new Error('Error sending reminder email');
+      }
+
+      return res.status(200).json({
+        success: true,
+        reminder,
+      });
+    } catch (error) {
+      console.log(error.message);
+      return res.status(400).json({
+        success: false,
+        error: error.message,
+        message: 'Error fetching reminder',
       });
     }
   }
