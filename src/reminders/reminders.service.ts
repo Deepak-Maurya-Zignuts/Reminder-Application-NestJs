@@ -256,10 +256,7 @@ export class RemindersService {
       // const user = await this.userModel.findById(ownerId);
 
       if (!reminder) {
-        return res.status(404).json({
-          success: false,
-          message: 'Reminder not found',
-        });
+        throw new Error('Reminder not found');
       }
 
       const owner = reminder.owner as unknown as User;

@@ -17,7 +17,19 @@ export class RemindersUtil {
 
       // ** fetching reminder details
       const reminders = await this.reminderModel.findOne({ _id: reminderId });
+      if (!reminders) {
+        throw new Error('Reminder not found');
+      }
+
       console.log(reminders.date, reminders.time, 'inside utils');
+
+      // ** time format hh:mm
+      const hour = parseInt(reminders.time?.split(':')[0]);
+      const minute = parseInt(reminders.time?.split(':')[1]);
+
+      // ** date format yyyy-mm-dd
+      const day = parseInt(reminders.date?.split('-')[2]);
+      const month = parseInt(reminders.date?.split('-')[1]);
 
       // ** Create a cron job here **
       const cronApiKey = process.env.CRON_API_KEY;
@@ -32,10 +44,10 @@ export class RemindersUtil {
           schedule: {
             timezone: 'Asia/Kolkata',
             expiresAt: 0,
-            hours: [15],
-            mdays: [18],
-            minutes: [-1],
-            months: [-1],
+            hours: [hour],
+            mdays: [day],
+            minutes: [minute],
+            months: [month],
             wdays: [-1],
           },
         },
