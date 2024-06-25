@@ -19,6 +19,12 @@ export class Reminder {
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   owner: Types.ObjectId;
+
+  @Prop({ type: Number, default: 0 })
+  cronId: number;
+
+  @Prop({ type: Boolean, default: false })
+  sent: boolean;
 }
 
 export const reminderSchema = SchemaFactory.createForClass(Reminder);

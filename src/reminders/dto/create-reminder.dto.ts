@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsDateString,
+  IsNumber,
+  IsBoolean,
+} from 'class-validator';
 import { Types } from 'mongoose';
 
 export class CreateReminderDto {
@@ -19,4 +25,10 @@ export class CreateReminderDto {
 
   @IsNotEmpty({ message: 'User Id must be required' })
   readonly owner: Types.ObjectId;
+
+  @IsNumber()
+  readonly cronId: number;
+
+  @IsBoolean()
+  readonly sent: boolean;
 }
