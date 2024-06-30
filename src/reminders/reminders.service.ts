@@ -119,6 +119,13 @@ export class RemindersService {
         { new: true },
       );
       console.log(reminder);
+
+      // ** update cron job
+      const cronUpdated = await this.remindersUtil.updateCronJob(ownerId, id);
+      if (!cronUpdated.success) {
+        throw new Error('Cron job update failed');
+      }
+
       return res.status(200).json({
         success: true,
         message: 'Reminder updated successfully',
@@ -137,6 +144,13 @@ export class RemindersService {
   // Delete a reminder
   async remove(ownerId: string, id: string, res: Response) {
     try {
+      // ** delete cron job
+      const crondeleted = await this.remindersUtil.deleteCronJob(ownerId, id);
+      if (!crondeleted.success) {
+        throw new Error('Cron job deletion failed');
+      }
+
+      // ** delete reminder
       const filter = {
         _id: id,
         owner: ownerId,
